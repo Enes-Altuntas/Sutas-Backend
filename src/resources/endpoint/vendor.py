@@ -62,7 +62,7 @@ def get_list(request, app_db, ume_db):
         username = get_jwt_identity()
         user_type = ume_db.get_user_info(username)[0]['user_type']
 
-        if user_type == 'PUR' or user_type == 'QTY':
+        if user_type == 'PUR' or user_type == 'QTY' or user_type == 'PLA':
 
             lifnrs = ume_db.get_user_sys_ids()
             for lifnr in lifnrs:
@@ -265,13 +265,12 @@ def del_attach(request, app_db, ume_db):
         for attach in attaches:
             attach['data_content'] = b64encode(
                 attach['data_content']).decode('utf-8')
-        
+
         ret = {
-        'vendor_attachs': attaches,
-        'refresh_token': create_refresh_token(identity=username)
+            'vendor_attachs': attaches,
+            'refresh_token': create_refresh_token(identity=username)
         }
         return jsonify(ret), 200
-
 
     except:
         raise GenericException("Ek silinirken bir hata oluştu !", 408)

@@ -14,6 +14,7 @@ from config import config
 host = config['host']
 client = config['client']
 
+
 @jwt_refresh_token_required
 def get_reports(request, app_db, ume_db):
     try:
@@ -51,7 +52,8 @@ def get_reports(request, app_db, ume_db):
         except:
             pass
 
-        r = requests.post(host + 'reports' + client, data=json.dumps({'OUT': parsed['DATA']}), verify=False)
+        r = requests.post(host + 'reports' + client,
+                          data=json.dumps({'OUT': parsed['DATA']}), verify=False)
         parsedSapData = json.loads(r.content)
         sentData = parsedSapData['OUT']
 
@@ -65,6 +67,7 @@ def get_reports(request, app_db, ume_db):
     except:
         raise GenericException(
             "Raporlar getirilirken bir sorunla karşılaşıldı!", 408)
+
 
 @jwt_refresh_token_required
 def find_po(request, app_db, ume_db):
@@ -133,7 +136,8 @@ def find_po(request, app_db, ume_db):
         except:
             pass
 
-        r = requests.post(host + 'find_po' + client, data=json.dumps({'OUT': parsed['DATA']}), verify=False)
+        r = requests.post(host + 'find_po' + client,
+                          data=json.dumps({'OUT': parsed['DATA']}), verify=False)
         parsedSapData = json.loads(r.content)
         sentData = parsedSapData['OUT']
 

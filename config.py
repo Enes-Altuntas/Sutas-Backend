@@ -5,13 +5,13 @@ config = {
     # "host": "https://sapeccdev.sutas.com.tr/zmm_pur_port/test/",
     # "client": "?sap-client=105",
 
-    ############################## QA SİSTEMİ ##################################
-    # "host": "https://10.0.1.64/zmm_pur_port/test/",
-    # "client": "?sap-client=200",
-
-    ############################# PROD SİSTEMİ ################################
-    "host": "https://10.34.100.44/zmm_pur_port/test/",
+    # ############################## QA SİSTEMİ ##################################
+    "host": "https://10.0.1.64/zmm_pur_port/test/",
     "client": "?sap-client=200",
+
+    ############################ PROD SİSTEMİ ################################
+    # "host": "https://10.34.100.44/zmm_pur_port/test/",
+    # "client": "?sap-client=200",
 
     "jwt": {
         "secret_key": "FIZ_BILISIM",
