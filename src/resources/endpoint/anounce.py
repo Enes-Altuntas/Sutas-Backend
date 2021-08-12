@@ -1,17 +1,17 @@
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
+    jwt_refresh_token_required,
     get_jwt_identity)
 from utils.exception import GenericException
 import json
 from flask import jsonify
-import datetime
 from base64 import b64encode
 from base64 import b64decode
 from collections import defaultdict
+from utils.token import Token
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def get_anounce(request, app_db, ume_db):
     try:
         username = get_jwt_identity()
@@ -21,7 +21,6 @@ def get_anounce(request, app_db, ume_db):
             anounces = app_db.get_anounces(user_info[0]['user_sys_id'])
             ret = {
                 'anounces': anounces,
-                'refresh_token': create_refresh_token(identity=username)
             }
 
         else:
@@ -42,7 +41,6 @@ def get_anounce(request, app_db, ume_db):
                     empty.append(item[0])
             ret = {
                 'anounces': empty,
-                'refresh_token': create_refresh_token(identity=username)
             }
 
         return jsonify(ret), 200
@@ -53,6 +51,7 @@ def get_anounce(request, app_db, ume_db):
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def send_anounce(request, app_db, ume_db):
     username = get_jwt_identity()
     user_info = ume_db.get_user_info(username)
@@ -83,13 +82,13 @@ def send_anounce(request, app_db, ume_db):
             empty.append(item[0])
     ret = {
         'anounces': empty,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def del_anounce(request, app_db, ume_db):
     username = get_jwt_identity()
     user_info = ume_db.get_user_info(username)
@@ -120,13 +119,13 @@ def del_anounce(request, app_db, ume_db):
             empty.append(item[0])
     ret = {
         'anounces': empty,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def push_help_attach(request, app_db, ume_db):
     username = get_jwt_identity()
     user_info = ume_db.get_user_info(username)
@@ -143,31 +142,33 @@ def push_help_attach(request, app_db, ume_db):
 
     attaches = app_db.get_help_attach()
     for attach in attaches:
-            attach['data_content'] = b64encode(
-                attach['data_content']).decode('utf-8')
+        attach['data_content'] = b64encode(
+            attach['data_content']).decode('utf-8')
     ret = {
         'attaches': attaches,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200
 
+
 @jwt_refresh_token_required
+@Token.check_refresh
 def pull_help_attach(request, app_db, ume_db):
     username = get_jwt_identity()
 
     attaches = app_db.get_help_attach()
     for attach in attaches:
-            attach['data_content'] = b64encode(
-                attach['data_content']).decode('utf-8')
+        attach['data_content'] = b64encode(
+            attach['data_content']).decode('utf-8')
     ret = {
         'attaches': attaches,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200
 
+
 @jwt_refresh_token_required
+@Token.check_refresh
 def del_help_attach(request, app_db, ume_db):
     username = get_jwt_identity()
     user_info = ume_db.get_user_info(username)
@@ -182,11 +183,10 @@ def del_help_attach(request, app_db, ume_db):
 
     attaches = app_db.get_help_attach()
     for attach in attaches:
-            attach['data_content'] = b64encode(
-                attach['data_content']).decode('utf-8')
+        attach['data_content'] = b64encode(
+            attach['data_content']).decode('utf-8')
     ret = {
         'attaches': attaches,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200

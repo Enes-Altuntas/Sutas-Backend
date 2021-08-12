@@ -262,7 +262,8 @@ class DBBase(object):
     def modify_user_role(self, username, role_id):
         cursor = self._con.cursor()
         cursor.execute(
-            'INSERT INTO user_role (username, role_id) VALUES (%s, %s) ON DUPLICATE KEY UPDATE username = %s, role_id = %s', (username, role_id, username, role_id)
+            'INSERT INTO user_role (username, role_id) VALUES (%s, %s) ON DUPLICATE KEY UPDATE username = %s, role_id = %s', (
+                username, role_id, username, role_id)
         )
         self._con.commit()
         return cursor.fetchall()
@@ -286,7 +287,8 @@ class DBBase(object):
     def change_pass(self, username, newpass):
         cursor = self._con.cursor()
         cursor.execute(
-            'UPDATE user SET password = %s WHERE username = %s', (newpass, username)
+            'UPDATE user SET password = %s WHERE username = %s', (
+                newpass, username)
         )
         self._con.commit()
         return cursor.fetchall()
@@ -301,7 +303,8 @@ class DBBase(object):
     def del_on_error_head(self, a, b):
         cursor = self._con.cursor()
         cursor.execute(
-            'DELETE FROM s_attach_header WHERE po_number = %s AND po_item = %s', (a, b)
+            'DELETE FROM s_attach_header WHERE po_number = %s AND po_item = %s', (
+                a, b)
         )
         self._con.commit()
         return cursor.fetchall()
@@ -317,7 +320,8 @@ class DBBase(object):
     def get_attach_id_head(self, a, b):
         cursor = self._con.cursor()
         cursor.execute(
-            'SELECT attach_id FROM s_attach_header WHERE po_number = %s AND po_item = %s', (a, b)
+            'SELECT attach_id FROM s_attach_header WHERE po_number = %s AND po_item = %s', (
+                a, b)
         )
         return cursor.fetchall()
 
@@ -395,4 +399,21 @@ class DBBase(object):
         cursor.execute(
             'SELECT * FROM plan_rej_desc'
         )
+        return cursor.fetchall()
+
+    def set_token(self, username, access_token, refresh_token, datetime, datetime_string):
+        cursor = self._con.cursor()
+        cursor.execute(
+            'INSERT INTO login (username, access_token, refresh_token, datetime, datetime_string) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE username = %s, access_token = %s, refresh_token = %s, datetime = %s, datetime_string = %s', (
+                username, access_token, refresh_token, datetime, datetime_string, username, access_token, refresh_token, datetime, datetime_string)
+        )
+        self._con.commit()
+        return cursor.fetchall()
+
+    def get_token(self, username):
+        cursor = self._con.cursor()
+        cursor.execute(
+            'SELECT refresh_token FROM login WHERE username = %s', (username)
+        )
+        self._con.commit()
         return cursor.fetchall()

@@ -1,8 +1,9 @@
+from functools import wraps
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
+    jwt_refresh_token_required,
     get_jwt_identity)
 from utils.exception import GenericException
+from utils.token import Token
 import src.resources.endpoint.anounce as anounce
 import json
 import requests
@@ -13,11 +14,14 @@ from config import config
 host = config['host']
 client = config['client']
 
+
 def get_row(section):
     return section.get('row')
 
+
 @jwt_refresh_token_required
-def getAll(request, ume_db, app_db):
+@Token.check_refresh
+def getAll(request, app_db, ume_db):
     try:
         badge = []
         msgParams = []
@@ -51,7 +55,8 @@ def getAll(request, ume_db, app_db):
             if adet > 0:
                 badgeBody = {}
                 badgeBody['id'] = user_info[0]['user_sys_id']
-                badgeBody['message'] = str(adet) + ' adet duyurunuz bulunmaktadır.'
+                badgeBody['message'] = str(
+                    adet) + ' adet duyurunuz bulunmaktadır.'
                 badgeBody['to'] = '/duyurular'
                 badge.append(badgeBody)
 
@@ -129,7 +134,7 @@ def getAll(request, ume_db, app_db):
         quans[6]['baslik'] = 'Mutabık Kalınmamış Siparişler'
         quans[7]['baslik'] = 'Revizyon Talebinde Bulunduğumuz Siparişler'
         quans[8]['baslik'] = 'Tamamı Sevk Edilmiş Siparişler'
-        
+
         sayi = {}
         sayi['baslik'] = 'İade Edilen Siparişler'
         sayi['id'] = '20'
@@ -139,11 +144,11 @@ def getAll(request, ume_db, app_db):
 
     except:
         raise GenericException("Veritabanında bir hata meydana geldi !", 408)
-    
+
     try:
         admin_info = []
         users = ume_db.get_users()
-        
+
         qty_count = 0
         sup_count = 0
         pla_count = 0
@@ -157,19 +162,20 @@ def getAll(request, ume_db, app_db):
                 pla_count += 1
             if user['user_type'] == 'SUP':
                 sup_count += 1
-                
-        admin_info_obj = { 'user_role': 'Kaliteci', 'user_count': qty_count }
+
+        admin_info_obj = {'user_role': 'Kaliteci', 'user_count': qty_count}
         admin_info.append(admin_info_obj)
-        admin_info_obj = { 'user_role': 'Planlamacı', 'user_count': pla_count }
+        admin_info_obj = {'user_role': 'Planlamacı', 'user_count': pla_count}
         admin_info.append(admin_info_obj)
-        admin_info_obj = { 'user_role': 'Satınalmacı', 'user_count': pur_count }
+        admin_info_obj = {'user_role': 'Satınalmacı', 'user_count': pur_count}
         admin_info.append(admin_info_obj)
-        admin_info_obj = { 'user_role': 'Tedarikçi', 'user_count': sup_count }
-        admin_info.append(admin_info_obj)              
-        
+        admin_info_obj = {'user_role': 'Tedarikçi', 'user_count': sup_count}
+        admin_info.append(admin_info_obj)
+
     except:
-        raise GenericException("Admin bilgileri çekilirken hata meydana geldi !", 408)
-    
+        raise GenericException(
+            "Admin bilgileri çekilirken hata meydana geldi !", 408)
+
     ret = {
         'opened_modules': [],
         'without_sub': [],
@@ -179,13 +185,11 @@ def getAll(request, ume_db, app_db):
         'werks': werksData,
         'badge': badge,
         'admin_info': admin_info,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     try:
         opened_modules = []
         module_sections = []
-        without_submenu = []
         for module in modules:
             if '{sup_id}' in module['url']:
                 module['url'] = module['url'].replace("{sup_id}",
@@ -194,7 +198,7 @@ def getAll(request, ume_db, app_db):
                 opened_modules.append(module)
             else:
                 module_sections.append(module)
-        
+
         module_sections.sort(key=get_row)
 
         for opened in opened_modules:
@@ -209,7 +213,7 @@ def getAll(request, ume_db, app_db):
     except:
         raise GenericException(
             'Menüler hazırlanırken bir hata meydana geldi !', 408)
-        
+
     for quan in quans[:]:
         done = False
         for module in module_sections:
@@ -218,15 +222,15 @@ def getAll(request, ume_db, app_db):
         if done != True:
             index = quans.index(quan)
             quans.pop(index)
-        
+
     for quan in quans:
         for module in module_sections:
             if module['description'] == quan['baslik']:
                 quan['row'] = module['row']
                 break
-    
+
     quans.sort(key=get_row)
-    
+
     # İptal edilenler Satınalma Kararı ve Tamamlananların Kaldırılması
     new_quans = []
     count = 1
@@ -237,7 +241,7 @@ def getAll(request, ume_db, app_db):
     for new_quan in new_quans:
         new_quan['row'] = count
         count += 1
-    
+
     ret['quans'] = new_quans
 
     return jsonify(ret), 200

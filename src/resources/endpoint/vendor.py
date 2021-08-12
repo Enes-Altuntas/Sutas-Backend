@@ -1,5 +1,4 @@
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
     get_jwt_identity)
 from utils.exception import GenericException
@@ -10,11 +9,13 @@ import requests
 from base64 import b64encode
 from base64 import b64decode
 from config import config
+from utils.token import Token
 
 host = config['host']
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def get_single(request, app_db, ume_db):
     try:
         data = request.data
@@ -57,6 +58,7 @@ def get_single(request, app_db, ume_db):
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def get_list(request, app_db, ume_db):
     try:
         username = get_jwt_identity()
@@ -74,7 +76,6 @@ def get_list(request, app_db, ume_db):
 
             ret = {
                 'vendor_list': sentData,
-                'refresh_token': create_refresh_token(identity=username)
             }
             return jsonify(ret), 200
 
@@ -88,9 +89,9 @@ def get_list(request, app_db, ume_db):
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def revUpdate(request, app_db, ume_db):
     # Request datasının çekilip parse edilmesi
-    username = get_jwt_identity()
     data = request.data
     parsed = json.loads(data)
     sapMsg = []
@@ -131,18 +132,17 @@ def revUpdate(request, app_db, ume_db):
     ret = {
         'vendor_info': sentData,
         'sapMsg': sapMsg,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def perUpdate(request, app_db, ume_db):
     # Request datasının çekilip parse edilmesi
     data = request.data
     parsed = json.loads(data)
-    username = get_jwt_identity()
     sapMsg = []
 
     # Yeni bilgilerin gönderilmesi
@@ -184,18 +184,17 @@ def perUpdate(request, app_db, ume_db):
     ret = {
         'vendor_info': sentData,
         'sapMsg': sapMsg,
-        'refresh_token': create_refresh_token(identity=username)
     }
 
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def post_attach(request, app_db, ume_db):
     try:
         data = request.data
         parsed = json.loads(data)
-        username = get_jwt_identity()
         attach = parsed['file'][0]
         attach['type'] = attach['content'].split(',')[0]
         attach['content'] = b64decode(attach['content'].split(',')[1])
@@ -238,17 +237,16 @@ def post_attach(request, app_db, ume_db):
 
     ret = {
         'vendor_attachs': attaches,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def del_attach(request, app_db, ume_db):
     try:
         data = request.data
         parsed = json.loads(data)
-        username = get_jwt_identity()
         app_db.del_v_attach(parsed['file'])
         attaches = app_db.get_ven_attach(parsed['sup_id'])
         for attach in attaches:
@@ -268,7 +266,6 @@ def del_attach(request, app_db, ume_db):
 
         ret = {
             'vendor_attachs': attaches,
-            'refresh_token': create_refresh_token(identity=username)
         }
         return jsonify(ret), 200
 
@@ -277,6 +274,7 @@ def del_attach(request, app_db, ume_db):
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def post_approve(request, app_db, ume_db):
     try:
         data = request.data
@@ -309,7 +307,6 @@ def post_approve(request, app_db, ume_db):
         ret = {
             'vendor_list': sentData,
             'sapMsg': sapMsg,
-            'refresh_token': create_refresh_token(identity=username)
         }
 
     except:

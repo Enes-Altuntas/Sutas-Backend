@@ -1,13 +1,14 @@
+from flask import app
+
+
 class EndPoint(object):
     @staticmethod
-    def do_operation(segment, id, request, ume_db, app_db):
+    def do_operation(segment, request, ume_db, app_db):
         if(segment == 'login'):
             import src.resources.endpoint.login as RequestedResource
             return RequestedResource.login(request,
+                                           app_db,
                                            ume_db)
-        elif(segment == 'refresh'):
-            import src.resources.endpoint.refresh as RequestedResource
-            return RequestedResource.refresh()
         elif(segment == 'po'):
             import src.resources.endpoint.po as RequestedResource
             return RequestedResource.getAll(request, app_db, ume_db)
@@ -18,13 +19,12 @@ class EndPoint(object):
 
         elif(segment == 'getPoAll'):
             import src.resources.endpoint.po as RequestedResource
-            return RequestedResource.get_po_all(request, app_db)
+            return RequestedResource.get_po_all(request, app_db, ume_db)
 
         elif(segment == 'main'):
             import src.resources.endpoint.main as RequestedResource
-            return RequestedResource.getAll(request,
-                                            ume_db,
-                                            app_db)
+            return RequestedResource.getAll(request, app_db, ume_db)
+
         elif(segment == 'vendor'):
             import src.resources.endpoint.vendor as RequestedResource
             return RequestedResource.get_single(request,
@@ -70,8 +70,7 @@ class EndPoint(object):
         elif(segment == 'getSasAttach'):
             import src.resources.endpoint.po as RequestedResource
             return RequestedResource.get_attach(request,
-                                                app_db,
-                                                ume_db)
+                                                app_db, ume_db)
 
         elif(segment == 'getVenAttach'):
             import src.resources.endpoint.vendor as RequestedResource
@@ -82,14 +81,12 @@ class EndPoint(object):
         elif(segment == 'delVenAttach'):
             import src.resources.endpoint.vendor as RequestedResource
             return RequestedResource.del_attach(request,
-                                                app_db,
-                                                ume_db)
+                                                app_db, ume_db)
 
         elif(segment == 'postVenAttach'):
             import src.resources.endpoint.vendor as RequestedResource
             return RequestedResource.post_attach(request,
-                                                 app_db,
-                                                 ume_db)
+                                                 app_db, ume_db)
 
         elif(segment == 'postapprove'):
             import src.resources.endpoint.vendor as RequestedResource
@@ -100,48 +97,46 @@ class EndPoint(object):
         elif(segment == 'sendPass'):
             import src.resources.endpoint.admin as RequestedResource
             return RequestedResource.sendPass(request,
-                                              ume_db,
-                                              app_db)
+                                              app_db,
+                                              ume_db)
 
         elif(segment == 'getUsers'):
             import src.resources.endpoint.admin as RequestedResource
             return RequestedResource.getUsers(request,
-                                              ume_db,
-                                              app_db)
+                                              app_db,
+                                              ume_db)
 
         elif(segment == 'update'):
             import src.resources.endpoint.admin as RequestedResource
             return RequestedResource.update(request,
-                                            ume_db,
-                                            app_db)
+                                            app_db,
+                                            ume_db)
 
         elif(segment == 'delete'):
             import src.resources.endpoint.admin as RequestedResource
             return RequestedResource.delete(request,
-                                            ume_db,
-                                            app_db)
+                                            app_db,
+                                            ume_db)
 
         elif(segment == 'forget'):
             import src.resources.endpoint.login as RequestedResource
             return RequestedResource.forget(request,
+                                            app_db,
                                             ume_db)
 
         elif(segment == 'newpass'):
             import src.resources.endpoint.login as RequestedResource
             return RequestedResource.changePass(request,
+                                                app_db,
                                                 ume_db)
 
         elif(segment == 'getReport'):
             import src.resources.endpoint.report as RequestedResource
-            return RequestedResource.get_reports(request,
-                                                 app_db,
-                                                 ume_db)
+            return RequestedResource.get_reports(request, app_db, ume_db)
 
         elif(segment == 'findPo'):
             import src.resources.endpoint.report as RequestedResource
-            return RequestedResource.find_po(request,
-                                             app_db,
-                                             ume_db)
+            return RequestedResource.find_po(request, app_db, ume_db)
 
         elif(segment == 'pushAttach'):
             import src.resources.endpoint.anounce as RequestedResource
@@ -151,13 +146,10 @@ class EndPoint(object):
 
         elif(segment == 'getHelpAtt'):
             import src.resources.endpoint.anounce as RequestedResource
-            return RequestedResource.pull_help_attach(request,
-                                                      app_db,
-                                                      ume_db)
+            return RequestedResource.pull_help_attach(request, app_db, ume_db)
 
         elif(segment == 'delHelpAtt'):
             import src.resources.endpoint.anounce as RequestedResource
             return RequestedResource.del_help_attach(request,
-                                                      app_db,
-                                                      ume_db)
-                                                      
+                                                     app_db,
+                                                     ume_db)

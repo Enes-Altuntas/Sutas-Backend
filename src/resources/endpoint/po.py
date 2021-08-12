@@ -1,6 +1,5 @@
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
+    jwt_refresh_token_required,
     get_jwt_identity)
 from utils.exception import GenericException
 import json
@@ -10,12 +9,14 @@ import requests
 from base64 import b64encode
 from base64 import b64decode
 from config import config
+from utils.token import Token
 
 host = config['host']
 client = config['client']
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def getAll(request, app_db, ume_db):
 
     username = get_jwt_identity()
@@ -28,32 +29,32 @@ def getAll(request, app_db, ume_db):
     user_type = ume_db.get_user_info(username)
     try:
         if user_type[0]['user_type'] == 'SUP':
-            
+
             if statu != '21':
                 r = requests.get(host + 'po_list' + client,
-                                params={'action': '2', 'statu': statu, 'sup_id': sup_id}, verify=False)
+                                 params={'action': '2', 'statu': statu, 'sup_id': sup_id}, verify=False)
                 parsedSapData = json.loads(r.content)
                 sentData = parsedSapData['OUT']
             else:
                 statu_onay = '02'
                 statu_sevk = '05'
                 r = requests.get(host + 'po_list' + client,
-                                params={'action': '2', 'statu': statu_onay, 'sup_id': sup_id}, verify=False)
+                                 params={'action': '2', 'statu': statu_onay, 'sup_id': sup_id}, verify=False)
                 parsedSapData = json.loads(r.content)
                 sentData = parsedSapData['OUT']
                 parsedSapData = ''
                 r = requests.get(host + 'po_list' + client,
-                                params={'action': '2', 'statu': statu_sevk, 'sup_id': sup_id}, verify=False)
+                                 params={'action': '2', 'statu': statu_sevk, 'sup_id': sup_id}, verify=False)
                 parsedSapData = json.loads(r.content)
                 for parsedData in parsedSapData['OUT']:
                     sentData.append(parsedData)
-                    
+
         else:
             r = requests.get(host + 'po_list' + client,
                              params={'action': '1', 'statu': statu}, verify=False)
             parsedSapData = json.loads(r.content)
             sentData = parsedSapData['OUT']
-            
+
         i = 0
         for data in sentData:
             i = i + 1
@@ -87,12 +88,12 @@ def getAll(request, app_db, ume_db):
 
     ret = {
         'sentData': sentData,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def get_attach(request, app_db, ume_db):
     try:
         attaches = []
@@ -117,13 +118,11 @@ def get_attach(request, app_db, ume_db):
     ret = {
         'attach': attaches,
         'sentData': sentData,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200
 
 
 def post_attach(attaches, items):
-    ume_db = DBBase.get_instance(**config['ume_db'])
     app_db = DBBase.get_instance(**config['app_db'])
     for attach in attaches:
         attach['type'] = attach['content'].split(',')[0]

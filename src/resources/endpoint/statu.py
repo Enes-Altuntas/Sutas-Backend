@@ -1,19 +1,19 @@
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
+    jwt_refresh_token_required,
     get_jwt_identity)
-from utils.exception import GenericException
 import json
 import src.resources.endpoint.po as RequestedResource
 from flask import jsonify
 import requests
 from config import config
+from utils.token import Token
 
 host = config['host']
 client = config['client']
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def update_statu(request, app_db, ume_db):
     username = get_jwt_identity()
     data = request.data
@@ -233,6 +233,5 @@ def update_statu(request, app_db, ume_db):
     ret = {
         'sentData': sentData,
         'sapMsg': sapMsg,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200

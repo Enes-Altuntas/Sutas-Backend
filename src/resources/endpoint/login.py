@@ -5,35 +5,39 @@ from flask_jwt_extended import (
 from utils.exception import GenericException
 import json
 from flask import jsonify
-import datetime
-import random
-import string
+from datetime import datetime
 import requests
-import jwt
 from config import config
+from utils.token import Token
 
 host = config['host']
 client = config['client']
 secret = config['jwt']['secret_key']
 
 
-def login(request, ume_db):
-
+def login(request, app_db, ume_db):
+    datetime_local = datetime.now()
+    datetime_local_str = datetime.now().strftime('%d/%m/%Y, %H:%M:%S')
     data = request.data
     parsed = json.loads(data)
     username = parsed['username']
     password = parsed['password']
+    db_pass = ume_db.get_user_info(username)[0]['password']
     try:
-        if (ume_db.get_user_info(username)[0]['password'] == password):
+        if (db_pass == password):
             ret = {
                 'refresh_token': create_refresh_token(identity=username),
+                'access_token': create_access_token(identity=username)
             }
+
+        ume_db.set_token(
+            username, ret['access_token'], ret['refresh_token'], datetime_local, datetime_local_str)
         return jsonify(ret), 200
     except:
         raise GenericException("Kullanıcı adı veya şifre hatalı !", 403)
 
 
-def forget(request, ume_db):
+def forget(request, app_db, ume_db):
     data = request.data
     parsed = json.loads(data)
     username = parsed['DATA']
@@ -56,7 +60,8 @@ def forget(request, ume_db):
 
 
 @jwt_refresh_token_required
-def changePass(request, ume_db):
+@Token.check_refresh
+def changePass(request, app_db, ume_db):
     try:
         username = get_jwt_identity()
         data = request.data

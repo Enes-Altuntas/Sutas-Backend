@@ -1,21 +1,21 @@
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
+    jwt_refresh_token_required,
     get_jwt_identity)
 from utils.exception import GenericException
 import src.resources.endpoint.anounce as anounce
 import json
 import requests
 from flask import jsonify
-from datetime import datetime, timedelta
 from config import config
+from utils.token import Token
 
 host = config['host']
 client = config['client']
 
 
 @jwt_refresh_token_required
-def sendPass(request, ume_db, app_db):
+@Token.check_refresh
+def sendPass(request, app_db, ume_db):
     username = get_jwt_identity()
     user_info = ume_db.get_user_info(username)
     data = request.data
@@ -23,14 +23,13 @@ def sendPass(request, ume_db, app_db):
     if user_info[0]['password'] == parsed['PASS']:
         ret = {
             'dialog': False,
-            'refresh_token': create_refresh_token(identity=username)
         }
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
-def getUsers(request, ume_db, app_db):
-    username = get_jwt_identity()
+@Token.check_refresh
+def getUsers(request, app_db, ume_db):
     try:
         users = ume_db.get_users()
     except:
@@ -39,15 +38,13 @@ def getUsers(request, ume_db, app_db):
 
     ret = {
         'users': users,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
-def update(request, ume_db, app_db):
-    username = get_jwt_identity()
-
+@Token.check_refresh
+def update(request, app_db, ume_db):
     data = request.data
     parsed = json.loads(data)
     sapMsg = []
@@ -80,15 +77,13 @@ def update(request, ume_db, app_db):
     ret = {
         'users': users,
         'sapMsg': sapMsg,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200
 
 
 @jwt_refresh_token_required
-def delete(request, ume_db, app_db):
-    username = get_jwt_identity()
-
+@Token.check_refresh
+def delete(request, app_db, ume_db):
     data = request.data
     parsed = json.loads(data)
     sapMsg = []
@@ -111,6 +106,5 @@ def delete(request, ume_db, app_db):
     ret = {
         'users': users,
         'sapMsg': sapMsg,
-        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200

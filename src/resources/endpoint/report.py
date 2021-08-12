@@ -1,24 +1,20 @@
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
-    get_jwt_identity)
+    jwt_refresh_token_required)
 from utils.exception import GenericException
 import json
 from flask import jsonify
-from datetime import datetime as dt
 import requests
-from base64 import b64encode
-from base64 import b64decode
 from config import config
+from utils.token import Token
 
 host = config['host']
 client = config['client']
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def get_reports(request, app_db, ume_db):
     try:
-        username = get_jwt_identity()
         data = request.data
         parsed = json.loads(data)
 
@@ -59,7 +55,6 @@ def get_reports(request, app_db, ume_db):
 
         ret = {
             'reports': sentData,
-            'refresh_token': create_refresh_token(identity=username)
         }
 
         return jsonify(ret), 200
@@ -70,9 +65,9 @@ def get_reports(request, app_db, ume_db):
 
 
 @jwt_refresh_token_required
+@Token.check_refresh
 def find_po(request, app_db, ume_db):
     try:
-        username = get_jwt_identity()
         data = request.data
         parsed = json.loads(data)
 
@@ -143,7 +138,6 @@ def find_po(request, app_db, ume_db):
 
         ret = {
             'findPo': sentData,
-            'refresh_token': create_refresh_token(identity=username)
         }
 
         return jsonify(ret), 200

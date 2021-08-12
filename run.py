@@ -10,7 +10,8 @@ app = Flask(__name__)
 
 cors = CORS(app)
 app.config['JWT_SECRET_KEY'] = config['jwt']['secret_key']
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = config['jwt']['exp_sec']
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = config['jwt']['exp_sec_access']
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = config['jwt']['exp_sec_refresh']
 app.config['JWT_ALGORITHM'] = config['jwt']['algorithm']
 
 jwt = JWTManager(app)
@@ -39,7 +40,6 @@ def do_operation_get(segment, id):
     check_connections(ume_db)
     check_connections(app_db)
     json_ret = EndPoint.do_operation(segment,
-                                     id,
                                      request,
                                      ume_db,
                                      app_db)
@@ -56,7 +56,6 @@ def do_operation_post(segment, id):
     check_connections(ume_db)
     check_connections(app_db)
     json_ret = EndPoint.do_operation(segment,
-                                     id,
                                      request,
                                      ume_db,
                                      app_db)

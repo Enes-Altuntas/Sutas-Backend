@@ -15,39 +15,40 @@ config = {
 
     "jwt": {
         "secret_key": "FIZ_BILISIM",
-        "exp_sec": 1800,
+        "exp_sec_access": 120,
+        "exp_sec_refresh": 7200,
         "algorithm": "HS256"
-    },
-
-    "ume_db": {
-        "type": "MySql",
-        "host": "localhost",
-        "username": "root",
-        "password": "",
-        "db": "ume"
-    },
-    "app_db": {
-        "type": "MySql",
-        "host": "localhost",
-        "username": "root",
-        "password": "",
-        "db": "app"
     },
 
     # "ume_db": {
     #     "type": "MySql",
-    #     "host": "127.0.0.1",
+    #     "host": "localhost",
     #     "username": "root",
-    #     "password": "3ae!M$Nu",
+    #     "password": "",
     #     "db": "ume"
     # },
     # "app_db": {
     #     "type": "MySql",
-    #     "host": "127.0.0.1",
+    #     "host": "localhost",
     #     "username": "root",
-    #     "password": "3ae!M$Nu",
+    #     "password": "",
     #     "db": "app"
     # },
+
+    "ume_db": {
+        "type": "MySql",
+        "host": "127.0.0.1",
+        "username": "root",
+        "password": "3ae!M$Nu",
+        "db": "ume"
+    },
+    "app_db": {
+        "type": "MySql",
+        "host": "127.0.0.1",
+        "username": "root",
+        "password": "3ae!M$Nu",
+        "db": "app"
+    },
 
     "charset": "utf-8"
 }
