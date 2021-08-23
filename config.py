@@ -20,35 +20,35 @@ config = {
         "algorithm": "HS256"
     },
 
-    # "ume_db": {
-    #     "type": "MySql",
-    #     "host": "localhost",
-    #     "username": "root",
-    #     "password": "",
-    #     "db": "ume"
-    # },
-    # "app_db": {
-    #     "type": "MySql",
-    #     "host": "localhost",
-    #     "username": "root",
-    #     "password": "",
-    #     "db": "app"
-    # },
-
     "ume_db": {
         "type": "MySql",
-        "host": "127.0.0.1",
+        "host": "localhost",
         "username": "root",
-        "password": "3ae!M$Nu",
+        "password": "",
         "db": "ume"
     },
     "app_db": {
         "type": "MySql",
-        "host": "127.0.0.1",
+        "host": "localhost",
         "username": "root",
-        "password": "3ae!M$Nu",
+        "password": "",
         "db": "app"
     },
+
+    # "ume_db": {
+    #     "type": "MySql",
+    #     "host": "127.0.0.1",
+    #     "username": "root",
+    #     "password": "3ae!M$Nu",
+    #     "db": "ume"
+    # },
+    # "app_db": {
+    #     "type": "MySql",
+    #     "host": "127.0.0.1",
+    #     "username": "root",
+    #     "password": "3ae!M$Nu",
+    #     "db": "app"
+    # },
 
     "charset": "utf-8"
 }
